@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIT Course Registration System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #f76902;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .course-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .course-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .course-code {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .course-credits {
+            background-color: #f76902;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .course-title {
+            font-size: 1.05em;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .course-department {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RIT Course Registration System</h1>
+        <div id="content">
+            <div class="loading">Loading courses...</div>
+        </div>
+    </div>
+
+    <script>
+        // Load courses from JSON file
+        async function loadCourses() {
+            const contentDiv = document.getElementById('content');
+            
+            try {
+                const response = await fetch('rit_courses.json');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load courses');
+                }
+                
+                const courses = await response.json();
+                displayCourses(courses);
+                
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <strong>Error:</strong> Could not load courses. 
+                        Please make sure 'rit_courses.json' exists in the same directory.
+                    </div>
+                `;
+                console.error('Error loading courses:', error);
+            }
+        }
+
+        function displayCourses(courses) {
+            const contentDiv = document.getElementById('content');
+            
+            if (!courses || courses.length === 0) {
+                contentDiv.innerHTML = '<p>No courses available.</p>';
+                return;
+            }
+
+            let html = '<div class="course-list">';
+            
+            courses.forEach(course => {
+                html += `
+                    <div class="course-card">
+                        <div class="course-header">
+                            <span class="course-code">${course.code || 'N/A'}</span>
+                            <span class="course-credits">${course.credits || 0} Credits</span>
+                        </div>
+                        <div class="course-title">${course.title || 'Untitled Course'}</div>
+                        <div class="course-department">Department: ${course.department || 'N/A'}</div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            contentDiv.innerHTML = html;
+        }
+
+        // Load courses when page loads
+        loadCourses();
+    </script>
+</body>
+</html>
